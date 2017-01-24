@@ -15,14 +15,16 @@
  *
  * =====================================================================================
  */
+
+#ifndef READER_H
+#define READER_H
+
 #include <iostream>
 #include	<vector>
 #include	<string>
 #include <algorithm>
 #include <map>
-#ifndef ENTRY_H
 #include "entry.hpp"
-#endif
 
 void read_file(std::vector<std::string>* buffers, std::string filename, int threads_num);
 
@@ -82,3 +84,5 @@ std::vector<std::string> process(std::vector<entry> entries, short mode, short l
 	result.erase(result.begin() + limit, result.end());
     return result;
 }
+
+#endif

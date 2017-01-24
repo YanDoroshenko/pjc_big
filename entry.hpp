@@ -17,6 +17,9 @@
  */
 #include<string>
 
+#ifndef ENTRY_H
+#define ENTRY_H
+
 class entry {
     public:
 	std::string date, time, msisdn, service_name;
@@ -46,3 +49,5 @@ inline bool compare_chronologically(const entry& e1, const entry& e2) {
 	return e1.time < e2.time;
     return e1.date < e2.date;
 }
+
+#endif

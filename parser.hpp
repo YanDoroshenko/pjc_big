@@ -15,8 +15,14 @@
  *
  * =====================================================================================
  */
+
+#ifndef PARSER_H
+#define PARSER_H
+
 #include	<vector>
 
 entry* parse(std::string);
 
 std::vector<entry> parse_vector(std::vector<std::string>);
+
+#endif

@@ -34,7 +34,8 @@ void read_file(vector<string>* buffers, string filename, int threads_num) {
     string line;
     int i = 0;
     while(getline(infile, line)) 
-	buffers[i++ % threads_num].push_back(to_string(++line_nr) + "!!!" + line);
+	if (line.find("Err,") != string::npos)
+	    buffers[i++ % threads_num].push_back(to_string(++line_nr) + "!!!" + line);
     infile.close();
 }
 
@@ -97,13 +98,7 @@ vector<string> process_results(vector<entry> entries, short mode, short limit) {
 
 int main(int c,char* args[]) {
     auto start = chrono::high_resolution_clock::now();
-    ifstream cpuinfo("/proc/cpuinfo");
-    string s;
-    short cpus = 0;
-    while (cpuinfo >> s)
-	if (s.find("processor") != string::npos)
-	    ++cpus;
-    cpuinfo.close();
+    int cpus = thread::hardware_concurrency();
     if (c < 2) {
 	cout << "Enter filename!" << endl;
 	return 1;
@@ -141,7 +136,7 @@ int main(int c,char* args[]) {
 	return 1;
     }
     cout << "Working..." << endl;
-   t.join();
+    t.join();
     cout << "Reading file complete" << endl;
     future<vector<entry>>* pool = new future<vector<entry>>[cpus];
     for (int i = 0; i < cpus; i++) {

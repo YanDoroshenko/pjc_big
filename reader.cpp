@@ -114,8 +114,8 @@ int main(int c,char* args[]) {
     short selection;
     try {
 	cin >> selection;
-	if (selection < 1 || selection > 4)
-	    throw exception();
+	if (selection < 1 || selection > 4) {
+	}
     }
     catch (exception& e){
 	cout << "Trying to mess with me, mr. user? Huh? Shutting down." << endl;
@@ -127,8 +127,12 @@ int main(int c,char* args[]) {
     short limit; 
     try {
 	cin >> limit;
-	if (limit < 0)
-	    throw exception();
+	if (limit < 0) {
+	    cout << "Trying to mess with me, mr. user? Huh? Shutting down." << endl;
+	    t.join();
+	    delete[] r;
+	    return 1;
+	}
     }
     catch (exception& e){
 	cout << "Trying to mess with me, mr. user? Huh? Shutting down." << endl;

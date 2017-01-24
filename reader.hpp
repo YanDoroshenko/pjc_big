@@ -19,11 +19,8 @@
 #ifndef READER_H
 #define READER_H
 
-#include <iostream>
-#include	<vector>
-#include	<string>
-#include <algorithm>
-#include <map>
+#include <vector>
+#include <string>
 #include "entry.hpp"
 
 void read_file(std::vector<std::string>* buffers, std::string filename, int threads_num);

@@ -18,14 +18,16 @@
 
 
 #include <chrono>
-#include <iostream>
 #include <fstream>
-#include <vector>
-#include <thread>
 #include <future>
-#include "reader.hpp"
-#include "parser.hpp"
+#include <iostream>
+#include <map>
+#include <parallel/algorithm>
+#include <thread>
+#include <vector>
 #include "mode.hpp"
+#include "parser.hpp"
+#include "reader.hpp"
 
 using namespace std;
 

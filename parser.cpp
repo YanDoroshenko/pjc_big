@@ -43,9 +43,7 @@ entry parse(string str) {
 vector<entry> parse_vector(vector<string> input) {
     vector<entry> result;
     for (string s: input) {
-	bool ws_error = s.find(",Err,") != string::npos;
-	if (ws_error)
-	    result.push_back(parse(s));
+	result.push_back(parse(s));
     }
     return result;
 }

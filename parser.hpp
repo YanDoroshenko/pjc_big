@@ -19,7 +19,8 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include	<vector>
+#include <vector>
+#include "entry.hpp"
 
 entry parse(std::string);
 

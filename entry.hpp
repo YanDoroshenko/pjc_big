@@ -15,39 +15,23 @@
  *
  * =====================================================================================
  */
-#include<string>
 
 #ifndef ENTRY_H
 #define ENTRY_H
+
+#include<string>
 
 class entry {
     public:
 	std::string date, time, msisdn, service_name;
 	long line_nr;
-
-	entry(long line_nr, std::string date, std::string time, std::string service_name, std::string msisdn) {
-	    this->line_nr = line_nr;
-	    this->date = date;
-	    this->time = time;
-	    this->service_name = service_name;
-	    this->msisdn = msisdn;
-	}
+    entry(long line_nr, std::string date, std::string time, std::string service_name, std::string msisdn);
 };
 
-inline bool compare_alphabetically(const entry& e1, const entry& e2) {
-    if (e1.service_name == e2.service_name) {
-	if (e1.date == e2.date)
-	    return e1.time < e2.time;
-	else 
-	    return e1.date < e2.date;
-    }
-    return e1.service_name < e2.service_name;
-}
 
-inline bool compare_chronologically(const entry& e1, const entry& e2) {
-    if (e1.date == e2.date)
-	return e1.time < e2.time;
-    return e1.date < e2.date;
-}
+bool compare_alphabetically(const entry& e1, const entry& e2);
+
+
+bool compare_chronologically(const entry& e1, const entry& e2);
 
 #endif

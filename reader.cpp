@@ -37,6 +37,63 @@ void read_file(vector<string>* buffers, string filename, int threads_num) {
     infile.close();
 }
 
+vector<string> process_results(vector<entry> entries, short mode, short limit) {
+    vector<string> result;
+    map<string, short> occurences;
+    vector<pair<string, short>> pairs;
+    short max_name_length = 0;
+    switch (mode) {
+	case 1:
+	    for (entry e: entries) {
+		occurences[e.service_name]++;
+	    }
+	    for (auto itr = occurences.begin(); itr != occurences.end(); ++itr)
+		pairs.push_back(*itr);
+	    sort(pairs.begin(), pairs.end(), [=](pair<string, short>& a, pair<string, short>& b)
+		    {
+		    return a.second > b.second;
+		    });
+	    for (auto i : pairs)
+		result.push_back(i.first + ": " + to_string(i.second));
+	    break;
+	case 2: 
+	    sort(entries.begin(), entries.end(), compare_chronologically);
+	    for (entry e: entries)
+		result.push_back(e.date + " " + e.time + " " + e.service_name);
+	    break;
+	case 3: 
+	    sort(entries.begin(), entries.end(), compare_alphabetically);
+	    for (entry e: entries) {
+		if (e.service_name.length() > max_name_length)
+		    max_name_length = e.service_name.length();
+	    }
+	    for (entry e: entries) {
+		string s = e.service_name;
+		for (short i = 0; i <= max_name_length - e.service_name.length(); i++)
+		    s += " ";
+		s = s + e.date + " " + e.time;
+		result.push_back(s);
+	    }
+	    break;
+	case 4:
+	    for (entry e: entries) {
+		occurences[e.msisdn]++;
+	    }
+	    for (auto itr = occurences.begin(); itr != occurences.end(); ++itr)
+		pairs.push_back(*itr);
+	    sort(pairs.begin(), pairs.end(), [=](pair<string, short>& a, pair<string, short>& b)
+		    {
+		    return a.second > b.second;
+		    });
+	    for (auto i : pairs)
+		result.push_back(i.first + ": " + to_string(i.second));
+	    break;
+    }
+    if (limit != 0 && result.size() > limit)
+	result.erase(result.begin() + limit, result.end());
+    return result;
+}
+
 int main(int c,char* args[]) {
     ifstream cpuinfo("/proc/cpuinfo");
     string s;
@@ -98,7 +155,7 @@ int main(int c,char* args[]) {
 	auto v = pool[i].get();
 	parse_results.insert(parse_results.begin(), v.begin(), v.end());
     }
-    for (string s : process(parse_results, selection, limit))
+    for (string s : process_results(parse_results, selection, limit))
 	cout << s << endl;
     delete[] r;
     delete[] pool;

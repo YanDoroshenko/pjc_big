@@ -21,7 +21,7 @@
 
 #include	<vector>
 
-entry* parse(std::string);
+entry parse(std::string);
 
 std::vector<entry> parse_vector(std::vector<std::string>);
 

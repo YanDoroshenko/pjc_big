@@ -39,6 +39,6 @@ bool compare_alphabetically(const entry& e1, const entry& e2) {
 
 bool compare_chronologically(const entry& e1, const entry& e2) {
     if (e1.date == e2.date)
-	return e1.time < e2.time;
-    return e1.date < e2.date;
+	return e1.time > e2.time;
+    return e1.date > e2.date;
 }

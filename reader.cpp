@@ -17,13 +17,14 @@
  */
 
 
-#include	<iostream>
-#include	<fstream>
-#include	<vector>
-#include	<thread>
-#include	<future>
-#include	"reader.hpp"
-#include	"parser.hpp"
+#include <chrono>
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <thread>
+#include <future>
+#include "reader.hpp"
+#include "parser.hpp"
 
 using namespace std;
 
@@ -95,6 +96,7 @@ vector<string> process_results(vector<entry> entries, short mode, short limit) {
 }
 
 int main(int c,char* args[]) {
+    auto start = chrono::high_resolution_clock::now();
     ifstream cpuinfo("/proc/cpuinfo");
     string s;
     short cpus = 0;
@@ -159,4 +161,6 @@ int main(int c,char* args[]) {
 	cout << s << endl;
     delete[] r;
     delete[] pool;
+    auto end = chrono::high_resolution_clock::now();
+    cout << "Execution took " << to_string((double)(end - start).count() / 1000000000) << endl;
 }

@@ -20,7 +20,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <chrono>
 #include "entry.hpp"
 
 using namespace std;
@@ -42,15 +41,11 @@ entry parse(string str) {
 }
 
 vector<entry> parse_vector(vector<string> input) {
-    auto start = chrono::high_resolution_clock::now();
     vector<entry> result;
     for (string s: input) {
 	bool ws_error = s.find(",Err,") != string::npos;
 	if (ws_error)
 	    result.push_back(parse(s));
     }
-    auto end = chrono::high_resolution_clock::now();
-    chrono::duration<double, nano>elapsed = end - start;
-    cout << "Thread finished processing, " +  to_string(elapsed.count() / input.size()) + "ns per line" << endl;
     return result;
 }

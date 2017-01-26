@@ -42,7 +42,7 @@ void read_file(vector<string>* buffers, string filename, int threads_num) {
     infile.close();
 }
 
-vector<string> process_results(vector<entry> entries, mode m, short limit) {
+vector<string> process_results(vector<entry> &entries, mode &m, short &limit) {
     vector<string> result;
     map<string, short> occurences;
     vector<pair<string, short>> pairs;

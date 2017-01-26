@@ -18,7 +18,7 @@
 
 #include "entry.hpp"
 
-entry::entry(long line_nr, std::string date, std::string time, std::string service_name, std::string msisdn) {
+entry::entry(long &line_nr, std::string &date, std::string &time, std::string &service_name, std::string &msisdn) {
 	    this->line_nr = line_nr;
 	    this->date = date;
 	    this->time = time;

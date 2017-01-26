@@ -22,15 +22,13 @@
 #include<string>
 
 class entry {
-    public:
-	std::string date, time, msisdn, service_name;
-	long line_nr;
-    entry(long &line_nr, std::string &date, std::string &time, std::string &service_name, std::string &msisdn);
+	public:
+		std::string date, time, msisdn, service_name;
+		long line_nr;
+		entry(long &line_nr, std::string &date, std::string &time, std::string &service_name, std::string &msisdn);
 };
 
-
 bool compare_alphabetically(const entry& e1, const entry& e2);
-
 
 bool compare_chronologically(const entry& e1, const entry& e2);
 

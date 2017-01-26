@@ -22,7 +22,7 @@
 #include <vector>
 #include "entry.hpp"
 
-entry parse(std::string);
+entry parse(std::string&);
 
 std::vector<entry> parse_vector(std::vector<std::string>);
 

@@ -27,7 +27,7 @@ using namespace std;
 #define TIME_LENGTH 12
 #define DATE_LENGTH 10
 
-entry parse(string str) {
+entry parse(string &str) {
     long line_nr = stol(str.substr(0, str.find("!!!")));
     string date = str.substr(str.find("!!!") + 3, DATE_LENGTH);
     string time = str.substr(str.find(date) + date.length() + 1, TIME_LENGTH);

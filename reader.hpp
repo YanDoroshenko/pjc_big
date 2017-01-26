@@ -25,6 +25,6 @@
 
 void read_file(std::vector<std::string>* buffers, std::string filename, int threads_num);
 
-std::vector<std::string> process_results(std::vector<entry> entries, short mode, short limit);
+std::vector<std::string> process_results(std::vector<entry> &entries, mode &m, short &limit);
 
 #endif

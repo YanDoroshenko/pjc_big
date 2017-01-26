@@ -101,46 +101,58 @@ vector<string> process_results(vector<entry> &entries, mode &m, short &limit) {
 
 int main(int c,char* args[]) {
     auto start = chrono::high_resolution_clock::now();
-    int cpus = thread::hardware_concurrency();
-    if (c < 2) {
-	cout << "Enter filename!" << endl;
-	return 1;
-    }
-    vector<string>* r = new vector<string>[cpus];
-    thread t(read_file, r, args[1], cpus);
-    cout << "Enter:" << endl;
-    cout << "1 for top failing services" << endl;
-    cout << "2 to see the errors in chronological order" << endl;
-    cout << "3 to see the services in alphabetic order" << endl;
-    cout << "4 to see the top problematic numbers" << endl;
+    int cpus;
     short selection;
-    try {
-	cin >> selection;
-	if (selection < 1 || selection > 4) {
-	}
-    }
-    catch (exception& e){
-	cout << "Trying to mess with me, mr. user? Huh? Shutting down." << endl;
-	t.join();
-	delete[] r;
-	return 1;
-    }
-    cout << "Enter maximum number of entries (0 for unlimited):" << endl;
     short limit; 
-    try {
-	cin >> limit;
-	if (limit < 0) {
+    thread t;
+	vector<string>* r;
+    if (c == 5) {
+	cpus = stoi(args[2]);
+	selection = stoi(args[3]);
+	limit = stoi(args[4]);
+	r = new vector<string>[cpus];
+	t = thread(read_file, r, args[1], cpus);
+    }
+    else {
+	cpus = thread::hardware_concurrency();
+	if (c < 2) {
+	    cout << "Enter filename!" << endl;
+	    return 1;
+	}
+	r = new vector<string>[cpus];
+	t = thread(read_file, r, args[1], cpus);
+	cout << "Enter:" << endl;
+	cout << "1 for top failing services" << endl;
+	cout << "2 to see the errors in chronological order" << endl;
+	cout << "3 to see the services in alphabetic order" << endl;
+	cout << "4 to see the top problematic numbers" << endl;
+	try {
+	    cin >> selection;
+	    if (selection < 1 || selection > 4) {
+	    }
+	}
+	catch (exception& e){
 	    cout << "Trying to mess with me, mr. user? Huh? Shutting down." << endl;
 	    t.join();
 	    delete[] r;
 	    return 1;
 	}
-    }
-    catch (exception& e){
-	cout << "Trying to mess with me, mr. user? Huh? Shutting down." << endl;
-	t.join();
-	delete[] r;
-	return 1;
+	cout << "Enter maximum number of entries (0 for unlimited):" << endl;
+	try {
+	    cin >> limit;
+	    if (limit < 0) {
+		cout << "Trying to mess with me, mr. user? Huh? Shutting down." << endl;
+		t.join();
+		delete[] r;
+		return 1;
+	    }
+	}
+	catch (exception& e){
+	    cout << "Trying to mess with me, mr. user? Huh? Shutting down." << endl;
+	    t.join();
+	    delete[] r;
+	    return 1;
+	}
     }
     cout << "Working..." << endl;
     t.join();
@@ -157,7 +169,7 @@ int main(int c,char* args[]) {
     vector<entry> parse_results;
     for (int i = 0; i < cpus; i++) {
 	auto v = pool[i].get();
-	parse_results.insert(parse_results.begin(), v.begin(), v.end());
+	parse_results.insert(parse_results.end(), v.begin(), v.end());
     }
     mode m = mode(selection - 1);
     for (string s : process_results(parse_results, m, limit))

@@ -37,7 +37,7 @@ entry parse(string &str) {
     int ws_name_start = str.find("WS,") + 3;
     int ws_name_end = str.find(",Err");
     string service_name = str.substr(ws_name_start, ws_name_end - ws_name_start);
-    return *(new entry(line_nr, date, time, service_name, msisdn));
+    return *unique_ptr<entry>(new entry(line_nr, date, time, service_name, msisdn));
 }
 
 vector<entry> parse_vector(vector<string> input) {

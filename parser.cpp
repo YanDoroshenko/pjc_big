@@ -76,6 +76,7 @@ void parse_vector(vector<string> *input, vector<string> *output, mode m) {
 	input->clear(); // clear memory
 }
 
+// merge results
 void merge(vector<string> *input) {
 	map<string, int> occurences;
 	vector<pair<string, int>> pairs;

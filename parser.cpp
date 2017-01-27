@@ -16,7 +16,9 @@
  * =====================================================================================
  */
 
+#include <iostream>
 #include <algorithm>
+#include <map>
 #include "parser.hpp"
 
 using namespace std;
@@ -28,15 +30,15 @@ using namespace std;
 string process_entry(unique_ptr<entry> e, mode &m) {
 	switch (m) {
 		case top_services:
-			return "";
+			return e->service_name;
 		case chronological:
 			return e->time + " " + e->date + " " + e->service_name;
 		case alphabetical:
 			return e->service_name + " " + e->date + " " + e->time;
 		case top_msisdn:
-			return "";
+			return e->msisdn;
 		default:
-			return "";
+			return "WRONG MODE";
 	}
 }
 
@@ -56,9 +58,40 @@ unique_ptr<entry> parse(string &str) {
 
 // process input vector, write results to output vector
 void parse_vector(vector<string> *input, vector<string> *output, mode m) {
-	for (string s: *input) {
-		output->push_back(process_entry(parse(s), m));
+	map<string, int> occurences;
+	if (m == chronological || m == alphabetical)
+		for (string s: *input) 
+			output->push_back(process_entry(parse(s), m));
+	else {
+		for (string s: *input)
+			occurences[process_entry(parse(s), m)]++;
+		for (auto i : occurences) {
+			string s = to_string(i.second);
+			s+=  ": ";
+			s+= i.first;
+			output->push_back(s);
+		}
 	}
 	sort(output->begin(), output->end()); // sort output
 	input->clear(); // clear memory
+}
+
+void merge(vector<string> *input) {
+	map<string, int> occurences;
+	vector<pair<string, int>> pairs;
+	for (string s: *input)
+		occurences[s.substr(s.find(": ") + 2)]+=stoi(s.substr(0, s.find(": ")));
+	input->clear();
+	for (auto i : occurences) {
+		pairs.push_back({i.first, i.second});
+	}
+	sort(pairs.begin(), pairs.end(), [=](const pair<string, int>&p1, const pair<string, int> &p2) {
+			return p2.second < p1.second;
+			});
+	for (auto i : pairs) {
+		string s = to_string(i.second);
+		s+=  ": ";
+		s+= i.first;
+		input->push_back(s);
+	}
 }

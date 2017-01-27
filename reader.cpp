@@ -117,6 +117,10 @@ int main(int c,char* args[]) {
 		pool[i].join(); // wait for parsers to finish
 	}
 	cout << "Waiting for parsers to finish" << endl;
+	if (m == top_msisdn || m == top_services) {
+		cout << "Merging results" << endl;
+		merge(&parse_results);
+	}
 	for (string s : parse_results)
 		cout << s << endl; // print results
 	delete[] r; // clear memory

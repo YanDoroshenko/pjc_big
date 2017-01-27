@@ -19,11 +19,17 @@
 #ifndef PARSER_H
 #define PARSER_H
 
+#include <memory>
 #include <vector>
 #include "entry.hpp"
+#include "mode.hpp"
 
-entry parse(std::string&);
+// create string from entry
+std::string process_entry(std::unique_ptr<entry>, mode&);
 
-std::vector<entry> parse_vector(std::vector<std::string>);
+// create an entry from string
+std::unique_ptr<entry> parse(std::string&);
+
+void parse_vector(std::vector<std::string>*, std::vector<std::string>*, mode); // parse an process a vector of strings and write results into the other vector
 
 #endif

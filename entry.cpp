@@ -26,6 +26,7 @@ entry::entry(long &line_nr, std::string &date, std::string &time, std::string &s
 	this->msisdn = msisdn;
 }
 
+// compare by service name
 bool compare_alphabetically(const entry& e1, const entry& e2) {
 	if (e1.service_name == e2.service_name) {
 		if (e1.date == e2.date)
@@ -36,6 +37,7 @@ bool compare_alphabetically(const entry& e1, const entry& e2) {
 	return e1.service_name < e2.service_name;
 }
 
+// compare chronologically
 bool compare_chronologically(const entry& e1, const entry& e2) {
 	if (e1.date == e2.date)
 		return e1.time > e2.time;

@@ -17,6 +17,9 @@
  */
 
 
+#include "mode.hpp"
+#include "parser.hpp"
+#include "reader.hpp"
 #include <chrono>
 #include <fstream>
 #include <future>
@@ -25,116 +28,63 @@
 #include <parallel/algorithm>
 #include <thread>
 #include <vector>
-#include "mode.hpp"
-#include "parser.hpp"
-#include "reader.hpp"
 
 using namespace std;
 
+// Function that single-threadily reads file, filtering the lines
 void read_file(vector<string>* buffers, string filename, int threads_num) {
-	long line_nr = 0;
+	long line_nr = 0; // line number counter
 	ifstream infile(filename);
 	string line;
 	int i = 0;
 	while(getline(infile, line)) 
-		if (line.find("Err,") != string::npos)
+		if (line.find("Err,") != string::npos) // filter line
 			buffers[i++ % threads_num].push_back(to_string(++line_nr) + "!!!" + line);
 	infile.close();
 }
 
-vector<string> process_results(vector<entry> &entries, mode &m, short &limit) {
-	vector<string> result;
-	map<string, short> occurences;
-	vector<pair<string, short>> pairs;
-	short max_name_length = 0;
-	switch (m) {
-		case mode::top_services:
-			for (entry e: entries) {
-				occurences[e.service_name]++;
-			}
-			for (auto itr = occurences.begin(); itr != occurences.end(); ++itr)
-				pairs.push_back(*itr);
-			sort(pairs.begin(), pairs.end(), [=](pair<string, short>& a, pair<string, short>& b)
-					{
-					return a.second > b.second;
-					});
-			for (auto i : pairs)
-				result.push_back(i.first + ": " + to_string(i.second));
-			break;
-		case mode::chronological: 
-			sort(entries.begin(), entries.end(), compare_chronologically);
-			for (entry e: entries)
-				result.push_back(e.date + " " + e.time + " " + e.service_name);
-			break;
-		case mode::alphabetical: 
-			sort(entries.begin(), entries.end(), compare_alphabetically);
-			for (entry e: entries) {
-				if (e.service_name.length() > max_name_length)
-					max_name_length = e.service_name.length();
-			}
-			for (entry e: entries) {
-				string s = e.service_name;
-				for (short i = 0; i <= max_name_length - e.service_name.length(); i++)
-					s += " ";
-				s = s + e.date + " " + e.time;
-				result.push_back(s);
-			}
-			break;
-		case mode::top_msisdn:
-			for (entry e: entries) {
-				occurences[e.msisdn]++;
-			}
-			for (auto itr = occurences.begin(); itr != occurences.end(); ++itr)
-				pairs.push_back(*itr);
-			sort(pairs.begin(), pairs.end(), [=](pair<string, short>& a, pair<string, short>& b)
-					{
-					return a.second > b.second;
-					});
-			for (auto i : pairs)
-				result.push_back(i.first + ": " + to_string(i.second));
-			break;
-	}
-	if (limit != 0 && result.size() > limit)
-		result.erase(result.begin() + limit, result.end());
-	return result;
-}
-
 int main(int c,char* args[]) {
-	auto start = chrono::high_resolution_clock::now();
-	int cpus;
-	short selection;
-	short limit; 
-	thread t;
-	vector<string>* r;
-	if (c == 5) {
+	auto start = chrono::high_resolution_clock::now(); // time measuring start
+	int cpus; // logical CPU number
+	short selection; // mode selection
+	short limit; //limit of row numbers
+	thread t; // file reading thread
+	vector<string>* r; // buffers
+	if (c == 5) { // non-interactive mode
 		cpus = stoi(args[2]);
 		selection = stoi(args[3]);
 		limit = stoi(args[4]);
 		r = new vector<string>[cpus];
-		t = thread(read_file, r, args[1], cpus);
+		t = thread(read_file, r, args[1], cpus); // start reading file
 	}
-	else {
-		cpus = thread::hardware_concurrency();
+	else { // interactive mode
+		cpus = thread::hardware_concurrency(); // get count of logical CPUs
 		if (c < 2) {
 			cout << "Enter filename!" << endl;
 			return 1;
 		}
 		r = new vector<string>[cpus];
-		t = thread(read_file, r, args[1], cpus);
+		t = thread(read_file, r, args[1], cpus); // start reading file
 		cout << "Enter:" << endl;
 		cout << "1 for top failing services" << endl;
 		cout << "2 to see the errors in chronological order" << endl;
 		cout << "3 to see the services in alphabetic order" << endl;
 		cout << "4 to see the top problematic numbers" << endl;
+
+		/* doing stupid stuff here because I can't throw exceptions */
 		try {
 			cin >> selection;
 			if (selection < 1 || selection > 4) {
+				cout << "Trying to mess with me, mr. user? Huh? Shutting down." << endl;
+				t.join(); // wait for file reading to finish
+				delete[] r; // clear memory
+				return 1;
 			}
 		}
 		catch (exception& e){
 			cout << "Trying to mess with me, mr. user? Huh? Shutting down." << endl;
-			t.join();
-			delete[] r;
+			t.join(); // wait for file reading to finish
+			delete[] r; // clear memory
 			return 1;
 		}
 		cout << "Enter maximum number of entries (0 for unlimited):" << endl;
@@ -142,40 +92,36 @@ int main(int c,char* args[]) {
 			cin >> limit;
 			if (limit < 0) {
 				cout << "Trying to mess with me, mr. user? Huh? Shutting down." << endl;
-				t.join();
-				delete[] r;
+				t.join(); // wait for file reading to finish
+				delete[] r; // clear memory
 				return 1;
 			}
 		}
 		catch (exception& e){
 			cout << "Trying to mess with me, mr. user? Huh? Shutting down." << endl;
-			t.join();
-			delete[] r;
+			t.join(); // wait for file reading to finish
+			delete[] r; // clear memory
 			return 1;
 		}
 	}
 	cout << "Working..." << endl;
-	t.join();
+	t.join(); // wait for file reading to finish
 	cout << "Reading file complete" << endl;
-	future<vector<entry>>* pool = new future<vector<entry>>[cpus];
+	future<void>* pool = new future<void>[cpus]; // executors 
+	vector<string> parse_results; // output vector
+	mode m = mode(selection - 1); // selected mode
 	for (int i = 0; i < cpus; i++) {
-		pool[i] = async(parse_vector, r[i]);
+		pool[i] = async(parse_vector, &r[i], &parse_results, m); // create futures to process the buffers
 	}
 	cout << "Parser threads created" << endl;
 	for (int i = 0; i < cpus; i++) {
-		pool[i].wait();
+		pool[i].wait(); // wait for parsers to finish
 	}
 	cout << "Waiting for parsers to finish" << endl;
-	vector<entry> parse_results;
-	for (int i = 0; i < cpus; i++) {
-		auto v = pool[i].get();
-		parse_results.insert(parse_results.end(), v.begin(), v.end());
-	}
-	mode m = mode(selection - 1);
-	for (string s : process_results(parse_results, m, limit))
-		cout << s << endl;
-	delete[] r;
-	delete[] pool;
-	auto end = chrono::high_resolution_clock::now();
-	cout << "Execution took " << to_string((double)(end - start).count() / 1000000000) << endl;
+	for (string s : parse_results)
+		cout << s << endl; // print results
+	delete[] r; // clear memory
+	delete[] pool; // clear memory
+	auto end = chrono::high_resolution_clock::now(); // measuring time end
+	cout << "Execution took " << to_string((double)(end - start).count() / 1000000000) << endl; // show time elapsed
 }

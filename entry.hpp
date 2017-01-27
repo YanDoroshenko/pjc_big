@@ -21,6 +21,7 @@
 
 #include<string>
 
+// class representing each error log entry
 class entry {
 	public:
 		std::string date, time, msisdn, service_name;
@@ -28,8 +29,8 @@ class entry {
 		entry(long &line_nr, std::string &date, std::string &time, std::string &service_name, std::string &msisdn);
 };
 
-bool compare_alphabetically(const entry& e1, const entry& e2);
+bool compare_alphabetically(const entry& e1, const entry& e2); // compare two entries by the service name
 
-bool compare_chronologically(const entry& e1, const entry& e2);
+bool compare_chronologically(const entry& e1, const entry& e2); // compare two entries by the occurence time
 
 #endif

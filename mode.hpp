@@ -19,6 +19,7 @@
 #ifndef MODE_H
 #define MODE_H
 
+// enum, representing user selected option of execution
 enum mode{ top_services, chronological, alphabetical, top_msisdn };
 
 #endif

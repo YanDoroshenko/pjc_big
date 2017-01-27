@@ -16,18 +16,32 @@
  * =====================================================================================
  */
 
-#include <regex>
-#include <iostream>
-#include <string>
-#include <vector>
-#include "entry.hpp"
+#include <algorithm>
+#include "parser.hpp"
 
 using namespace std;
 
 #define TIME_LENGTH 12
 #define DATE_LENGTH 10
 
-entry parse(string &str) {
+// create string from entry
+string process_entry(unique_ptr<entry> e, mode &m) {
+	switch (m) {
+		case top_services:
+			return "";
+		case chronological:
+			return e->time + " " + e->date + " " + e->service_name;
+		case alphabetical:
+			return e->service_name + " " + e->date + " " + e->time;
+		case top_msisdn:
+			return "";
+		default:
+			return "";
+	}
+}
+
+// create an entry from string
+unique_ptr<entry> parse(string &str) {
 	long line_nr = stol(str.substr(0, str.find("!!!")));
 	string date = str.substr(str.find("!!!") + 3, DATE_LENGTH);
 	string time = str.substr(str.find(date) + date.length() + 1, TIME_LENGTH);
@@ -37,13 +51,14 @@ entry parse(string &str) {
 	int ws_name_start = str.find("WS,") + 3;
 	int ws_name_end = str.find(",Err");
 	string service_name = str.substr(ws_name_start, ws_name_end - ws_name_start);
-	return *unique_ptr<entry>(new entry(line_nr, date, time, service_name, msisdn));
+	return unique_ptr<entry>(new entry(line_nr, date, time, service_name, msisdn));
 }
 
-vector<entry> parse_vector(vector<string> input) {
-	vector<entry> result;
-	for (string s: input) {
-		result.push_back(parse(s));
+// process input vector, write results to output vector
+void parse_vector(vector<string> *input, vector<string> *output, mode m) {
+	for (string s: *input) {
+		output->push_back(process_entry(parse(s), m));
 	}
-	return result;
+	sort(output->begin(), output->end()); // sort output
+	input->clear(); // clear memory
 }

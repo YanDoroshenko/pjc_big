@@ -22,10 +22,9 @@
 #include "reader.hpp"
 #include <chrono>
 #include <fstream>
-#include <future>
 #include <iostream>
 #include <map>
-#include <parallel/algorithm>
+#include <algorithm>
 #include <thread>
 #include <vector>
 
@@ -107,15 +106,15 @@ int main(int c,char* args[]) {
 	cout << "Working..." << endl;
 	t.join(); // wait for file reading to finish
 	cout << "Reading file complete" << endl;
-	future<void>* pool = new future<void>[cpus]; // executors 
+	thread* pool = new thread[cpus]; // executors 
 	vector<string> parse_results; // output vector
 	mode m = mode(selection - 1); // selected mode
 	for (int i = 0; i < cpus; i++) {
-		pool[i] = async(parse_vector, &r[i], &parse_results, m); // create futures to process the buffers
+		pool[i] = thread(parse_vector, &r[i], &parse_results, m); // create futures to process the buffers
 	}
 	cout << "Parser threads created" << endl;
 	for (int i = 0; i < cpus; i++) {
-		pool[i].wait(); // wait for parsers to finish
+		pool[i].join(); // wait for parsers to finish
 	}
 	cout << "Waiting for parsers to finish" << endl;
 	for (string s : parse_results)

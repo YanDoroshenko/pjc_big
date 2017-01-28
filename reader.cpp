@@ -119,8 +119,9 @@ int main(int c,char* args[]) {
 	cout << "Waiting for parsers to finish" << endl;
 	if (m == top_msisdn || m == top_services) {
 		cout << "Merging results" << endl;
-		merge(&parse_results);
+		merge(&parse_results); // merge results
 	}
+	limit_results(&parse_results, limit); // limit output
 	for (string s : parse_results)
 		cout << s << endl; // print results
 	delete[] r; // clear memory

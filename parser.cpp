@@ -96,3 +96,8 @@ void merge(vector<string> *input) {
 		input->push_back(s);
 	}
 }
+
+void limit_results(vector<string>* input, short &limit) {
+	if (limit != 0)
+		input->erase(input->begin() + limit, input->end());
+}

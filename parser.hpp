@@ -34,4 +34,6 @@ void parse_vector(std::vector<std::string>*, std::vector<std::string>*, mode); /
 
 void merge(std::vector<std::string>*); // merge results from different threads
 
+void limit_results(std::vector<std::string>*, short&); // limit the output
+
 #endif

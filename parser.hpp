@@ -20,6 +20,7 @@
 #define PARSER_H
 
 #include <memory>
+#include <mutex>
 #include <vector>
 #include "entry.hpp"
 #include "mode.hpp"

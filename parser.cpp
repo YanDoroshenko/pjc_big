@@ -58,10 +58,14 @@ unique_ptr<entry> parse(string &str) {
 
 // process input vector, write results to output vector
 void parse_vector(vector<string> *input, vector<string> *output, mode m) {
+	mutex mtx;
 	map<string, int> occurences;
 	if (m == chronological || m == alphabetical)
-		for (string s: *input) 
+		for (string s: *input) {
+			mtx.lock();
 			output->push_back(process_entry(parse(s), m));
+			mtx.unlock();
+		}
 	else {
 		for (string s: *input)
 			occurences[process_entry(parse(s), m)]++;
@@ -72,7 +76,9 @@ void parse_vector(vector<string> *input, vector<string> *output, mode m) {
 			output->push_back(s);
 		}
 	}
+	mtx.lock();
 	sort(output->begin(), output->end()); // sort output
+	mtx.unlock();
 	input->clear(); // clear memory
 }
 

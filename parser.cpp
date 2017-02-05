@@ -100,6 +100,6 @@ void merge(vector<string> *input) {
 }
 
 void limit_results(vector<string>* input, short &limit) {
-	if (limit != 0)
+	if (limit != 0 && limit < input->size())
 		input->erase(input->begin() + limit, input->end());
 }

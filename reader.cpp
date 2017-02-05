@@ -122,6 +122,9 @@ int main(int c,char* args[]) {
 		cout << "Merging results" << endl;
 		merge(&parse_results); // merge results
 	}
+	else {
+		sort(parse_results.begin(), parse_results.end());
+	}
 	limit_results(&parse_results, limit); // limit output
 	for (string s : parse_results)
 		cout << s << endl; // print results

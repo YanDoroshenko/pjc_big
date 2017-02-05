@@ -20,11 +20,11 @@
 #include "mode.hpp"
 #include "parser.hpp"
 #include "reader.hpp"
+#include <algorithm>
 #include <chrono>
 #include <fstream>
 #include <iostream>
 #include <map>
-#include <algorithm>
 #include <thread>
 #include <vector>
 
@@ -107,10 +107,11 @@ int main(int c,char* args[]) {
 	t.join(); // wait for file reading to finish
 	cout << "Reading file complete" << endl;
 	thread* pool = new thread[cpus]; // executors 
+	mutex mtx;
 	vector<string> parse_results; // output vector
 	mode m = mode(selection - 1); // selected mode
 	for (int i = 0; i < cpus; i++) {
-		pool[i] = thread(parse_vector, &r[i], &parse_results, m); // create futures to process the buffers
+		pool[i] = thread(parse_vector, &r[i], &parse_results, m, &mtx); // create threads to process the buffers
 	}
 	cout << "Parser threads created" << endl;
 	for (int i = 0; i < cpus; i++) {

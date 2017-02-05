@@ -57,14 +57,12 @@ unique_ptr<entry> parse(string &str) {
 }
 
 // process input vector, write results to output vector
-void parse_vector(vector<string> *input, vector<string> *output, mode m) {
-	mutex mtx;
+void parse_vector(vector<string> *input, vector<string> *output, mode m, mutex* mtx) {
 	map<string, int> occurences;
 	if (m == chronological || m == alphabetical)
 		for (string s: *input) {
-			mtx.lock();
+			lock_guard<mutex> lock(*mtx);
 			output->push_back(process_entry(parse(s), m));
-			mtx.unlock();
 		}
 	else {
 		for (string s: *input)
@@ -73,12 +71,10 @@ void parse_vector(vector<string> *input, vector<string> *output, mode m) {
 			string s = to_string(i.second);
 			s+=  ": ";
 			s+= i.first;
+			lock_guard<mutex> lock(*mtx);
 			output->push_back(s);
 		}
 	}
-	mtx.lock();
-	sort(output->begin(), output->end()); // sort output
-	mtx.unlock();
 	input->clear(); // clear memory
 }
 
@@ -104,6 +100,6 @@ void merge(vector<string> *input) {
 }
 
 void limit_results(vector<string>* input, short &limit) {
-	if (limit != 0 && limit > input->size())
+	if (limit != 0)
 		input->erase(input->begin() + limit, input->end());
 }
